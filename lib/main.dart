@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:weatherapp/const/images.dart';
 import 'package:weatherapp/current_weather_model.dart';
+import 'package:weatherapp/hourly_weather_model.dart';
 import 'package:weatherapp/out_themes.dart';
 import 'const/colors.dart';
 import 'const/strings.dart';
@@ -64,8 +65,8 @@ class WeatherApp extends StatelessWidget {
       body: FutureBuilder(
         future: controller.currentWeatherData,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-
           if (snapshot.hasData) {
+            print('-----------------------------------------------');
             CurrentWeatherData data = snapshot.data;
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -85,14 +86,14 @@ class WeatherApp extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Image.asset(
-                          "assets/icons/${data.weather![0].icon}",
+                          "assets/weather/${data.weather![0].icon}.png",
                           width: 80,
                           height: 80,
                         ),
                         RichText(
                           text: TextSpan(children: [
                             TextSpan(
-                              text: "${data.main!.temp}",
+                              text: "${data.main!.temp}$degree",
                               style: TextStyle(
                                 color: theme.primaryColor,
                                 fontSize: 64,
@@ -122,7 +123,7 @@ class WeatherApp extends StatelessWidget {
                               Icons.expand_less_rounded,
                               color: theme.primaryColor,
                             ),
-                            label: "${data.main!.tempMin}"
+                            label: "${data.main!.tempMin}$degree"
                                 .text
                                 .color(theme.primaryColor)
                                 .make()),
@@ -132,7 +133,7 @@ class WeatherApp extends StatelessWidget {
                               Icons.expand_more_rounded,
                               color: theme.primaryColor,
                             ),
-                            label: "${data.main!.tempMax}"
+                            label: "${data.main!.tempMax}$degree"
                                 .text
                                 .color(
                                   theme.primaryColor,
@@ -145,7 +146,11 @@ class WeatherApp extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: List.generate(3, (index) {
                           var iconList = [clouds, humidity, windSpeed];
-                          var values = ["${data.clouds!.all}", "${data.main!.humidity}", "${data.wind!.speed} km/h"];
+                          var values = [
+                            "${data.clouds!.all}%",
+                            "${data.main!.humidity}%",
+                            "${data.wind!.speed} km/h"
+                          ];
                           return Column(
                             children: [
                               Image.asset(
@@ -165,40 +170,66 @@ class WeatherApp extends StatelessWidget {
                         })),
                     const Divider(),
                     10.heightBox,
-                    SizedBox(
-                      height: 150,
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const BouncingScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 7,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: const EdgeInsets.only(right: 2),
-                              decoration: BoxDecoration(
-                                color: cardColor,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                children: [
-                                  "${index + 1} AM".text.gray200.make(),
-                                  Image.asset(
-                                    "assets/icons/couldson.png",
-                                    height: 80,
-                                    width: 80,
-                                  ),
-                                  "38$degree"
-                                      .text
-                                      .color(
-                                        theme.primaryColor,
-                                      )
-                                      .white
-                                      .make(),
-                                ],
-                              ),
+                    FutureBuilder(
+                        future: controller.hourlyWeatherData,
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData) {
+                            print("-==========================================-");
+                            HourlyWeatherData hourlyData = snapshot.data;
+                            print("-==========================================-");
+                            return SizedBox(
+                              height: 160,
+                              child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const BouncingScrollPhysics(),
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: hourlyData.list!.length > 6
+                                      ? 6
+                                      : hourlyData.list!.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    var time = DateFormat().add_jm().format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            hourlyData.list![index].dt!
+                                                    .toInt() *
+                                                1000));
+                                    return Container(
+                                      margin: const EdgeInsets.only(right: 2),
+                                      decoration: BoxDecoration(
+                                        color: cardColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          "${time}".text.bold.gray100.make(),
+                                          Image.asset(
+                                            "assets/weather/${hourlyData.list![index].weather![0].icon}.png",
+                                            height: 80,
+                                            width: 80,
+                                          ),
+                                          "${hourlyData.list![index].main!.temp}$degree"
+                                              .text
+                                              .bold
+                                              .color(
+                                                theme.primaryColor,
+                                              )
+                                              .white
+                                              .make(),
+                                        ],
+                                      ),
+                                    );
+                                  }),
                             );
-                          }),
-                    ),
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        }),
                     10.heightBox,
                     const Divider(),
                     10.heightBox,

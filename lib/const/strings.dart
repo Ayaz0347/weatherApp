@@ -1,5 +1,5 @@
 const String degree = "°";
-const String apiKey = "3862b54c82e32a63cae75ed086b8ccd9";
+const String apiKey = "02b962f9ffc5aff021d2186859b5d627";
 const String units="metric";
 const String endPoint =
     "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}";

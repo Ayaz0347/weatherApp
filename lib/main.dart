@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:weatherapp/const/images.dart';
+import 'package:weatherapp/current_weather_model.dart';
 import 'package:weatherapp/out_themes.dart';
 import 'const/colors.dart';
 import 'const/strings.dart';
@@ -63,7 +64,9 @@ class WeatherApp extends StatelessWidget {
       body: FutureBuilder(
         future: controller.currentWeatherData,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
+
           if (snapshot.hasData) {
+            CurrentWeatherData data = snapshot.data;
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Padding(
@@ -71,7 +74,8 @@ class WeatherApp extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    "Peshawar"
+                    "${data.name}"
+                        .toUpperCase()
                         .text
                         .xl3
                         .color(theme.primaryColor)
@@ -81,14 +85,14 @@ class WeatherApp extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Image.asset(
-                          "assets/icons/sunny.png",
+                          "assets/icons/${data.weather![0].icon}",
                           width: 80,
                           height: 80,
                         ),
                         RichText(
                           text: TextSpan(children: [
                             TextSpan(
-                              text: "37$degree",
+                              text: "${data.main!.temp}",
                               style: TextStyle(
                                 color: theme.primaryColor,
                                 fontSize: 64,
@@ -96,7 +100,7 @@ class WeatherApp extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: "Sunny",
+                              text: "${data.weather![0].main}",
                               style: TextStyle(
                                 color: theme.primaryColor,
                                 fontSize: 14,
@@ -118,7 +122,7 @@ class WeatherApp extends StatelessWidget {
                               Icons.expand_less_rounded,
                               color: theme.primaryColor,
                             ),
-                            label: "41$degree"
+                            label: "${data.main!.tempMin}"
                                 .text
                                 .color(theme.primaryColor)
                                 .make()),
@@ -128,7 +132,7 @@ class WeatherApp extends StatelessWidget {
                               Icons.expand_more_rounded,
                               color: theme.primaryColor,
                             ),
-                            label: "27$degree"
+                            label: "${data.main!.tempMax}"
                                 .text
                                 .color(
                                   theme.primaryColor,
@@ -141,7 +145,7 @@ class WeatherApp extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: List.generate(3, (index) {
                           var iconList = [clouds, humidity, windSpeed];
-                          var values = ["70%", "40%", "3.5 km/h"];
+                          var values = ["${data.clouds!.all}", "${data.main!.humidity}", "${data.wind!.speed} km/h"];
                           return Column(
                             children: [
                               Image.asset(

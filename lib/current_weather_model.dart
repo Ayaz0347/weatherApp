@@ -64,17 +64,17 @@ class Main {
     this.grndLevel,
   });
 
-  double? temp;
-  double? tempMin;
-  double? tempMax;
+  int? temp;
+  int? tempMin;
+  int? tempMax;
   int? humidity;
   int? seaLevel;
   int? grndLevel;
 
   factory Main.fromJson(Map<String, dynamic> json) => Main(
-        temp: json["temp"].toDouble(),
-        tempMin: json["temp_min"].toDouble(),
-        tempMax: json["temp_max"].toDouble(),
+        temp: json["temp"].toInt(),
+        tempMin: json["temp_min"].toInt(),
+        tempMax: json["temp_max"].toInt(),
         humidity: json["humidity"],
         seaLevel: json["sea_level"],
         grndLevel: json["grnd_level"],
